@@ -2,7 +2,7 @@ name: prayers-237
 
 on:
   schedule:
-    - cron: "0 3 * * *"   # daily 03:00 UTC (adjust if you want)
+    - cron: "0 4 * * *"   # daily
   workflow_dispatch:
 
 permissions:
@@ -20,14 +20,22 @@ jobs:
         with:
           node-version: 20
 
-      - name: Run scraper
-        run: node scrape_prayers_237.js
+      - name: Install deps
+        run: |
+          npm init -y
+          npm i playwright
+
+      - name: Install browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Scrape Shobiddak
+        run: node scrape_shobiddak_237.js
 
       - name: Commit & push JSON
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add prayers_237.json
+          git add prayers_237.json debug_body.txt || true
           git diff --cached --quiet && echo "No changes" && exit 0
           git commit -m "Update prayers_237.json"
           git push
